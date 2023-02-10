@@ -1,12 +1,40 @@
+import { findByProps } from "@vendetta/metro";
 import { logger } from "@vendetta";
-import Settings from "./Settings";
+
+const CurrentUserStore = findByProps("getCurrentUser");
+const SerialState = findByProps("getSerializedState");
+const Dialog = findByProps('show', 'openLazy', 'close')
+const reload = () => findByProps("NativeModules").BundleUpdaterManager.reload;
 
 export default {
     onLoad: () => {
-        logger.log("Hello world!");
+        try {
+            const setExperiments = () => {
+                CurrentUserStore.getCurrentUser().flags |= 1;
+                CurrentUserStore._dispatcher._actionHandlers
+                    ._computeOrderedActionHandlers("OVERLAY_INITIALIZE")
+                    .forEach(function (e) {
+                        e.name.includes("Experiment") &&
+                        e.actionHandler({
+                            serializedExperimentStore: SerialState.getSerializedState(),
+                            user: { flags: 1 },
+                        });
+                    });
+            };
+            setTimeout(() => {
+                setExperiments();
+            }, 500);
+        } catch(e) {
+            logger.log(`An error has occured with EnableStaging: ${e}`)
+        }
     },
     onUnload: () => {
-        logger.log("Goodbye, world.");
-    },
-    settings: Settings,
+        Dialog.show({
+            title: "Experiments Disabled.",
+            body: "Disabling Experiments requires a restart, would you like to restart Discord?",
+            confirmText: "Yes",
+            cancelText: "No",
+            onConfirm: reload,
+        });
+    }
 }

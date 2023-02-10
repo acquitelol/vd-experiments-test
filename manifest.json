@@ -1,10 +1,10 @@
 {
-    "name": "Template Plugin",
-    "description": "A plugin for use as a template.",
+    "name": "EnableStaging",
+    "description": "Enables experiments :3 Ported from Enmity's Experiments",
     "authors": [
         {
-            "name": "You!",
-            "id": "YOUR_ID_HERE"
+            "name": "Rosie<3",
+            "id": "581573474296791211"
         }
     ],
     "main": "src/index.ts",
